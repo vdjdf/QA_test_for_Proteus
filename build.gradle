@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+}
+
+ext {
+    selenideVersion         = '7.2.2'
+    cucumberVersion         = '7.15.0'
+    junitVersion            = '4.13.2'
+    lombokVersion           = "1.18.30"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Selenide (включает Selenium внутри)
+    testImplementation "com.codeborne:selenide:${selenideVersion}"
+
+    // Cucumber
+    testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
+    testImplementation "io.cucumber:cucumber-junit:${cucumberVersion}"
+
+    // JUnit 4
+    testImplementation "junit:junit:${junitVersion}"
+
+    //Lombok
+    implementation "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+    testCompileOnly "org.projectlombok:lombok:$lombokVersion"
+    testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+}
+
+test {
+    useJUnit()
+    systemProperty 'cucumber.publish.quiet', 'true'
+}
