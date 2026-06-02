@@ -7,25 +7,27 @@ import io.cucumber.java.ru.Тогда;
 import org.junit.Assert;
 import pages.LoginPage;
 
+import static com.codeborne.selenide.Condition.visible;
 
 public class LoginPageSteps {
 
     private final LoginPage loginPage = new LoginPage();
 
-    @Дано("открыта страница авторизации")
-    public void loginPageIsOpen() {
-        // страница открыта в Hooks.setUp()
+    @Когда("вводим email {string} в форме анкеты")
+    public void enterEmail(String email) {
+        loginPage.getEmailInput().shouldBe(visible).clear();
+        loginPage.getEmailInput().sendKeys(email);
     }
 
-    @Когда("вводим email {string} и пароль {string}")
-    public void enterEmailAndPassword(String email, String password) {
-        loginPage.enterEmail(email);
-        loginPage.enterPassword(password);
+    @Когда("вводим пароль {string}")
+    public void enterPassword(String password) {
+        loginPage.getPasswordInput().shouldBe(visible).clear();
+        loginPage.getPasswordInput().sendKeys(password);
     }
 
     @И("нажимаем кнопку Вход")
     public void clickLoginButton() {
-        loginPage.clickLogin();
+        loginPage.getAuthButton().click();
     }
 
     @Тогда("отображается ошибка формата email")
@@ -33,8 +35,9 @@ public class LoginPageSteps {
         Assert.assertTrue("ошибка формата email не отобразилась",
                 loginPage.getEmailFormatError().isDisplayed());
     }
+
     @Тогда("отображается текст ошибки формата email")
-    public void emailFormatErrorIsDisplayedTEXT() {
+    public void emailFormatErrorIsDisplayedText() {
         Assert.assertEquals("Текст ошибки формата email не совпал с ожидаемым",
                 loginPage.getErrorTextEmailFormat(),
                 loginPage.getEmailFormatError().getText());
@@ -44,5 +47,12 @@ public class LoginPageSteps {
     public void invalidCredentialsErrorIsDisplayed() {
         Assert.assertTrue("ошибка неверных учётных данных не отобразилась",
                 loginPage.getInvalidCredError().isDisplayed());
+    }
+
+    @Тогда("отображается текст ошибки неверных учётных данных")
+    public void invalidCredentialsErrorIsDisplayedText() {
+        Assert.assertEquals("Текст ошибки неверных учётных данных не совпал с ожидаемым",
+                loginPage.getErrorTextInvalidCredentials(),
+                loginPage.getInvalidCredError().getText());
     }
 }

@@ -1,3 +1,4 @@
+package hooks;
 
 import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
@@ -18,11 +19,9 @@ public class Hooks {
     @Before
     public void setUp() {
         Configuration.browser = "chrome";
-        Configuration.headless = System.getenv("CI") != null;
         Configuration.timeout = 5000;
         Selenide.open(HTML_FILE_URL);
     }
-
 
     @After
     public void tearDown() {
