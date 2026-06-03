@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    // Selenide (включает Selenium внутри)
+    // Selenide
     testImplementation "com.codeborne:selenide:${selenideVersion}"
 
     // Cucumber
