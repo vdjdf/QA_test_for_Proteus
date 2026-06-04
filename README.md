@@ -1,5 +1,5 @@
 
-Java 21 · Selenide 7.2.2 · Cucumber + JUnit 4 · Lombok · Page Object
+Java 21 · Selenide 7.2.2 · JUnit 5 · Lombok · Page Object 
 
 ## Авторизация
 

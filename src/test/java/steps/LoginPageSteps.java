@@ -1,58 +1,55 @@
 package steps;
 
-import io.cucumber.java.ru.Дано;
-import io.cucumber.java.ru.И;
-import io.cucumber.java.ru.Когда;
-import io.cucumber.java.ru.Тогда;
-import org.junit.Assert;
 import pages.LoginPage;
 
 import static com.codeborne.selenide.Condition.visible;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LoginPageSteps {
 
     private final LoginPage loginPage = new LoginPage();
 
-    @Когда("вводим email {string} в форме анкеты")
-    public void enterEmail(String email) {
+    public LoginPageSteps enterEmail(String email) {
         loginPage.getEmailInput().shouldBe(visible).clear();
         loginPage.getEmailInput().sendKeys(email);
+        return this;
     }
 
-    @Когда("вводим пароль {string}")
-    public void enterPassword(String password) {
+    public LoginPageSteps enterPassword(String password) {
         loginPage.getPasswordInput().shouldBe(visible).clear();
         loginPage.getPasswordInput().sendKeys(password);
+        return this;
     }
 
-    @И("нажимаем кнопку Вход")
-    public void clickLoginButton() {
+    public LoginPageSteps clickLogin() {
         loginPage.getAuthButton().click();
+        return this;
     }
 
-    @Тогда("отображается ошибка формата email")
-    public void emailFormatErrorIsDisplayed() {
-        Assert.assertTrue("ошибка формата email не отобразилась",
-                loginPage.getEmailFormatError().isDisplayed());
+    public LoginPageSteps emailFormatErrorIsDisplayed() {
+        assertTrue(loginPage.getEmailFormatError().isDisplayed(),
+                "Ошибка формата email не отобразилась");
+        return this;
     }
 
-    @Тогда("отображается текст ошибки формата email")
-    public void emailFormatErrorIsDisplayedText() {
-        Assert.assertEquals("Текст ошибки формата email не совпал с ожидаемым",
-                loginPage.getErrorTextEmailFormat(),
-                loginPage.getEmailFormatError().getText());
+    public LoginPageSteps emailFormatErrorTextIsCorrect() {
+        assertEquals(loginPage.getErrorTextEmailFormat(),
+                loginPage.getEmailFormatError().getText(),
+                "Текст ошибки формата email не совпал с ожидаемым");
+        return this;
     }
 
-    @Тогда("отображается ошибка неверных учётных данных")
-    public void invalidCredentialsErrorIsDisplayed() {
-        Assert.assertTrue("ошибка неверных учётных данных не отобразилась",
-                loginPage.getInvalidCredError().isDisplayed());
+    public LoginPageSteps invalidCredentialsErrorIsDisplayed() {
+        assertTrue(loginPage.getInvalidCredError().isDisplayed(),
+                "Ошибка неверных учётных данных не отобразилась");
+        return this;
     }
 
-    @Тогда("отображается текст ошибки неверных учётных данных")
-    public void invalidCredentialsErrorIsDisplayedText() {
-        Assert.assertEquals("Текст ошибки неверных учётных данных не совпал с ожидаемым",
-                loginPage.getErrorTextInvalidCredentials(),
-                loginPage.getInvalidCredError().getText());
+    public LoginPageSteps invalidCredentialsErrorTextIsCorrect() {
+        assertEquals(loginPage.getErrorTextInvalidCredentials(),
+                loginPage.getInvalidCredError().getText(),
+                "Текст ошибки неверных учётных данных не совпал с ожидаемым");
+        return this;
     }
 }

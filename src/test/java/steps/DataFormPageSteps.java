@@ -1,12 +1,7 @@
 package steps;
 
 import com.codeborne.selenide.SelenideElement;
-import io.cucumber.java.ru.Дано;
-import io.cucumber.java.ru.И;
-import io.cucumber.java.ru.Когда;
-import io.cucumber.java.ru.Тогда;
 import model.FormEntry;
-import org.junit.Assert;
 import pages.DataFormPage;
 import pages.LoginPage;
 
@@ -14,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.codeborne.selenide.Condition.visible;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DataFormPageSteps {
 
@@ -21,115 +19,106 @@ public class DataFormPageSteps {
     private final DataFormPage dataFormPage = new DataFormPage();
     private FormEntry currentEntry;
 
-    @Дано("пользователь авторизован")
-    public void userIsLoggedIn() {
+    public DataFormPageSteps login(String email, String password) {
         loginPage.getEmailInput().shouldBe(visible).clear();
-        loginPage.getEmailInput().sendKeys("test@protei.ru");
+        loginPage.getEmailInput().sendKeys(email);
         loginPage.getPasswordInput().shouldBe(visible).clear();
-        loginPage.getPasswordInput().sendKeys("test");
+        loginPage.getPasswordInput().sendKeys(password);
         loginPage.getAuthButton().click();
+        return this;
     }
 
-    @Когда("вводим email {string}")
-    public void enterEmail(String email) {
+    public DataFormPageSteps enterEmail(String email) {
         currentEntry = new FormEntry();
         currentEntry.setEmail(email);
         dataFormPage.getEmailInput().shouldBe(visible).clear();
         dataFormPage.getEmailInput().sendKeys(email);
+        return this;
     }
 
-    @Когда("вводим имя {string}")
-    public void enterName(String name) {
+    public DataFormPageSteps enterName(String name) {
         currentEntry.setName(name);
         dataFormPage.getNameInput().shouldBe(visible).clear();
         dataFormPage.getNameInput().sendKeys(name);
+        return this;
     }
 
-    @И("выбираем пол (Мужской|Женский)?$")
-    public void selectGender(String gender) {
+    public DataFormPageSteps selectGender(String gender) {
         currentEntry.setGender(gender);
-        dataFormPage.getGenderSelect().selectOptionByValue(
-                gender.equals("Мужской") ? "Мужской" : "Женский"
-        );
+        dataFormPage.getGenderSelect().selectOptionByValue(gender);
+        return this;
     }
 
-    @И("отмечаем чекбокс 1.1")
-    public void checkOption11() {
+    public DataFormPageSteps checkOption11() {
         currentEntry.setCheck11(true);
         toggleCheckbox(dataFormPage.getCheckbox11(), true);
+        return this;
     }
 
-    @И("отмечаем чекбокс 1.2")
-    public void checkOption12() {
+    public DataFormPageSteps checkOption12() {
         currentEntry.setCheck12(true);
         toggleCheckbox(dataFormPage.getCheckbox12(), true);
+        return this;
     }
 
-    @И("выбираем радиокнопку {string}")
-    public void selectRadioOption(String option) {
-        currentEntry.setChoice2(option);
-
-        switch (option) {
-            case "2.1":
-                dataFormPage.getRadioButton21().click();
-                break;
-            case "2.2":
-                dataFormPage.getRadioButton22().click();
-                break;
-            case "2.3":
-                dataFormPage.getRadioButton23().click();
-                break;
-        }
-    }
-
-    @И("нажимаем Добавить")
-    public void clickSubmit() {
-        dataFormPage.getSubmitButton().click();
-    }
-
-    @И("подтверждаем модальное окно")
-    public void confirmModal() {
-        dataFormPage.getModalOkButton().shouldBe(visible).click();
-    }
-
-    @И("отжали чекбоксы 1.1 и 1.2")
-    public void resetCheckboxes() {
+    public DataFormPageSteps resetCheckboxes() {
+        currentEntry.setCheck11(false);
+        currentEntry.setCheck12(false);
         toggleCheckbox(dataFormPage.getCheckbox11(), false);
         toggleCheckbox(dataFormPage.getCheckbox12(), false);
+        return this;
     }
 
-    @Тогда("запись корректно отображается в таблице")
-    public void verifyLastRowMatchesEntry() {
-        Assert.assertFalse("Таблица не должна быть пустой", dataFormPage.getTableRows().isEmpty());
+    public DataFormPageSteps selectRadio(String option) {
+        currentEntry.setChoice2(option);
+        switch (option) {
+            case "2.1" -> dataFormPage.getRadioButton21().click();
+            case "2.2" -> dataFormPage.getRadioButton22().click();
+            case "2.3" -> dataFormPage.getRadioButton23().click();
+        }
+        return this;
+    }
+
+    public DataFormPageSteps clickSubmit() {
+        dataFormPage.getSubmitButton().click();
+        return this;
+    }
+
+    public DataFormPageSteps confirmModal() {
+        dataFormPage.getModalOkButton().shouldBe(visible).click();
+        return this;
+    }
+
+    public DataFormPageSteps verifyLastRowMatchesEntry() {
+        assertFalse(dataFormPage.getTableRows().isEmpty(), "Таблица не должна быть пустой");
         List<String> row = new ArrayList<>();
         for (SelenideElement cell : dataFormPage.getTableRows().last().$$("td").asFixedIterable()) {
             row.add(cell.getText());
         }
-
-        Assert.assertEquals("Email",   currentEntry.getEmail(), row.get(0));
-        Assert.assertEquals("Имя",     currentEntry.getName(), row.get(1));
-        Assert.assertEquals("Пол",     currentEntry.getGender(), row.get(2));
-        Assert.assertEquals("Выбор 1", currentEntry.getChoice1(), row.get(3));
-        Assert.assertEquals("Выбор 2", currentEntry.getChoice2(), row.get(4));
+        assertEquals(currentEntry.getEmail(), row.get(0), "Email");
+        assertEquals(currentEntry.getName(), row.get(1), "Имя");
+        assertEquals(currentEntry.getGender(), row.get(2), "Пол");
+        assertEquals(currentEntry.getChoice1(), row.get(3), "Выбор 1");
+        assertEquals(currentEntry.getChoice2(), row.get(4), "Выбор 2");
+        return this;
     }
 
-    @Тогда("в таблице {int} строк")
-    public void tableHasRowCount(int expectedCount) {
-        Assert.assertEquals(
-                "Количество строк в таблице должно быть " + expectedCount,
-                expectedCount, dataFormPage.getTableRows().size());
+    public DataFormPageSteps verifyTableRowCount(int expected) {
+        assertEquals(expected, dataFormPage.getTableRows().size(),
+                "Количество строк в таблице должно быть " + expected);
+        return this;
     }
 
-    @Тогда("отображается ошибка формата email в форме анкеты")
-    public void emailFormatErrorIsDisplayedInDataForm() {
-        Assert.assertTrue("Ошибка формата email должна отобразиться",
-                dataFormPage.getEmailFormatError().isDisplayed());
+    public DataFormPageSteps emailFormatErrorIsDisplayed() {
+        assertTrue(dataFormPage.getEmailFormatError().isDisplayed(),
+                "Ошибка формата email должна отобразиться");
+        return this;
     }
 
-    @Тогда("отображается ошибка пустого имени")
-    public void blankNameErrorIsDisplayed() {
-        Assert.assertTrue("Ошибка пустого имени должна отобразиться",
-                dataFormPage.getBlankNameError().isDisplayed());
+    public DataFormPageSteps blankNameErrorIsDisplayed() {
+        assertTrue(dataFormPage.getBlankNameError().isDisplayed(),
+                "Ошибка пустого имени должна отобразиться");
+        return this;
     }
 
     private void toggleCheckbox(SelenideElement checkbox, boolean shouldBeChecked) {
